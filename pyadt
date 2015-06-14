@@ -19,6 +19,7 @@ import urllib2
 from datetime import datetime
 from gzip import GzipFile
 import logging
+import re
 logging.basicConfig(level=logging.DEBUG)
 
 from collections import defaultdict
@@ -259,6 +260,17 @@ class ADT(cmd.Cmd):
                 os.system('sz '+pipes.quote(ADT.cached+filepath))
         else:
             print ('No such file.')
+
+
+    def do_search(self, arg):
+        'Search using case insensitive regexp'
+        pattern = re.compile(arg, re.IGNORECASE)
+        for k in self.db.keys():
+            for kk in self.db[k].keys():
+                for v in self.db[k][kk].values():
+                    if pattern.search(v.name) or pattern.search(v.desc):
+                        path = k+'/'+kk+'/'
+                        print path + v.info(28 - len(path))
 
 if __name__=='__main__':
     ADT().cmdloop()
